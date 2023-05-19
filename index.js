@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 5000;
 
@@ -10,8 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 
-app.get('/', (req, res)=>{
-    res.send('Toy Car Store is Running');
+app.get('/', (req, res) => {
+  res.send('Toy Car Store is Running');
 })
 
 
@@ -34,26 +34,33 @@ async function run() {
     const toyCarCollection = client.db('ToyCarStore').collection('ToyGallery');
     const addToyCollection = client.db('ToyCarStore').collection('AddToy');
 
-    app.get('/toyGallery', async(req, res)=>{
-        const result = await toyCarCollection.find().toArray();
-        res.send(result);
+    app.get('/toyGallery', async (req, res) => {
+      const result = await toyCarCollection.find().toArray();
+      res.send(result);
     })
 
-    app.post('/addToys', async(req, res)=>{
+    app.post('/addToys', async (req, res) => {
       const body = req.body;
       const result = await addToyCollection.insertOne(body);
       res.send(result);
     })
 
-    app.get('/allToys', async(req, res)=>{
+    app.get('/allToys', async (req, res) => {
       const result = await addToyCollection.find({}).toArray();
       res.send(result);
     })
 
-    app.get('/allToys/:email', async(req, res) =>{
-      const result = await addToyCollection.find({postedBy: req.params.email}).toArray();
+    app.get('/allToys/:email', async (req, res) => {
+      const result = await addToyCollection.find({ postedBy: req.params.email }).toArray();
       res.send(result);
       console.log(req.params.email);
+    })
+
+    app.delete('/allToys/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await addToyCollection.deleteOne(query);
+      res.send(result);
     })
 
 
@@ -71,6 +78,6 @@ run().catch(console.dir);
 
 
 
-app.listen(port, ()=>{
-    console.log(`Toy Car Store Server is running on port: ${port}`);
+app.listen(port, () => {
+  console.log(`Toy Car Store Server is running on port: ${port}`);
 })
