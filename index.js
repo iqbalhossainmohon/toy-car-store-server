@@ -9,13 +9,10 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-console.log(process.env.DB_USER);
 
 app.get('/', (req, res)=>{
     res.send('Toy Car Store is Running');
 })
-
-
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.d8lmf1g.mongodb.net/?retryWrites=true&w=majority`;
@@ -35,11 +32,19 @@ async function run() {
     await client.connect();
 
     const toyCarCollection = client.db('ToyCarStore').collection('ToyGallery');
+    const addToyCollection = client.db('ToyCarStore').collection('AddToy');
 
     app.get('/toyGallery', async(req, res)=>{
         const result = await toyCarCollection.find().toArray();
         res.send(result);
     })
+
+    app.post('/addToys', async(req, res)=>{
+      const body = req.body;
+      const result = await addToyCollection.insertOne(body);
+      res.send(result);
+    })
+
 
 
     // Send a ping to confirm a successful connection
