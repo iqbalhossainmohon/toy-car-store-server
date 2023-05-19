@@ -63,7 +63,7 @@ async function run() {
       console.log(req.params.email);
     })
 
-    app.get('/allToys/:id', async(req, res) =>{
+    app.get('/allToys/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await addToyCollection.findOne(query);
@@ -71,10 +71,23 @@ async function run() {
       res.send(result);
     })
 
-    app.put('/allToys/:id', async(req, res) =>{
+    app.put('/allToys/:id', async (req, res) => {
       const id = req.params.id;
       const updateToy = req.body;
       console.log(updateToy);
+
+      const query = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updatedToyCar = {
+        $set: {
+          name,
+          category,
+          price,
+          quantity
+        }
+      }
+      const result = await addToyCollection.updateOne(query, updatedToyCar, options);
+      res.send(result);
     })
 
 
